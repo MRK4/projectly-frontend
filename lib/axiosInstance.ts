@@ -4,6 +4,10 @@ const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   headers: {
     "Content-Type": "application/json",
+    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+    "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept",
+    "Access-Control-Allow-Credentials": "true",
   },
   withCredentials: true,
 });
