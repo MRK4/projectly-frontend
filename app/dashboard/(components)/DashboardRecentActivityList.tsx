@@ -48,7 +48,7 @@ export const DashboardRecentActivityList: React.FC<
             >
               <div className="w-full inline-flex flex-row items-center gap-4">
                 <Avatar>
-                  <AvatarImage src={activity.name} alt={activity.name} />
+                  <AvatarImage alt={activity.name} />
                   <AvatarFallback className="bg-white text-primary">
                     {activity.name
                       .split(" ")
