@@ -44,13 +44,30 @@ export const LoginForm = () => {
         });
       }
     } catch (error: any) {
-      // get the error message from the response
-      const message = error.response.data.message;
-      toast({
-        title: "An error occurred",
-        description: message,
-        variant: "destructive",
-      });
+      console.error(error);
+      // switch case for different error codes
+      switch (error.response.status) {
+        case 400:
+          toast({
+            title: "An error occurred",
+            description: "Missing fields.",
+            variant: "destructive",
+          });
+          break;
+        case 401:
+          toast({
+            title: "An error occurred",
+            description: "Please check your credentials and try again.",
+            variant: "destructive",
+          });
+          break;
+        default:
+          toast({
+            title: "An error occurred",
+            description: "Please try again later.",
+            variant: "destructive",
+          });
+      }
     } finally {
       setLoading(false);
     }
@@ -67,6 +84,7 @@ export const LoginForm = () => {
           <div className="gap-1">
             <Label htmlFor="username">Username</Label>
             <Input
+              required
               id="username"
               defaultValue=""
               placeholder="test"
@@ -77,6 +95,7 @@ export const LoginForm = () => {
           <div className="gap-1">
             <Label htmlFor="password">Password</Label>
             <Input
+              required
               id="password"
               type="password"
               defaultValue=""
