@@ -3,6 +3,9 @@ import axios from "axios";
 const axiosInstance = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   withCredentials: true,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
 
 // Pour chaque requete, si l'utilisateur est connecté, on ajoute le token dans le header

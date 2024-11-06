@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import axiosInstance from "../lib/axiosInstance";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 export const RegisterForm = () => {
   const [email, setEmail] = useState("");
@@ -22,6 +23,7 @@ export const RegisterForm = () => {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -33,10 +35,48 @@ export const RegisterForm = () => {
         username,
         password,
       });
-      console.log("Réponse du serveur:", response);
-      router.push("/dashboard");
-    } catch (error) {
+      if (response.status === 201) {
+        toast({
+          title: "Account created ! ✨",
+          description: "You can now log in.",
+        });
+        // reset the form
+        setEmail("");
+        setUsername("");
+        setPassword("");
+      } else {
+        toast({
+          title: "An error occurred!",
+          description: "Failed to send the form",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
       console.error(error);
+      // switch case for different error codes
+      switch (error.response.status) {
+        case 400:
+          toast({
+            title: "An error occurred!",
+            description: "Missing fields.",
+            variant: "destructive",
+          });
+          break;
+        case 409:
+          toast({
+            title: "An error occurred!",
+            description: "Email or username already in use.",
+            variant: "destructive",
+          });
+          break;
+        default:
+          toast({
+            title: "An error occurred!",
+            description: "Please try again later.",
+            variant: "destructive",
+          });
+          break;
+      }
     } finally {
       setLoading(false);
     }
@@ -53,6 +93,7 @@ export const RegisterForm = () => {
           <div className="gap-1">
             <Label htmlFor="email">Email adress</Label>
             <Input
+              required
               id="email"
               defaultValue=""
               placeholder="your@mail.test"
@@ -63,6 +104,7 @@ export const RegisterForm = () => {
           <div className="gap-1">
             <Label htmlFor="username">Username</Label>
             <Input
+              required
               id="username"
               defaultValue=""
               placeholder="test"
@@ -73,6 +115,7 @@ export const RegisterForm = () => {
           <div className="gap-1">
             <Label htmlFor="password">Password</Label>
             <Input
+              required
               id="password"
               type="password"
               defaultValue=""

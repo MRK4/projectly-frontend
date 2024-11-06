@@ -2,15 +2,28 @@
 
 import axiosInstance from "../lib/axiosInstance";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 export const ApiTestButton = () => {
-  const handleTest = async () => {
+  const { toast } = useToast();
+
+  const handleTestApi = async () => {
     try {
       const response = await axiosInstance.get("/");
-      console.log(response);
-    } catch (error) {
-      console.error(error);
+      toast({
+        title: `API Test - ${response.status}`,
+        description: response.data,
+      });
+      console.log(response.data);
+    } catch (error: any) {
+      const message = error.response.data;
+      toast({
+        title: "An error occurred",
+        description: message,
+        variant: "destructive",
+      });
     }
   };
-  return <Button onClick={handleTest}>Test the API</Button>;
+
+  return <Button onClick={handleTestApi}>Test the API</Button>;
 };

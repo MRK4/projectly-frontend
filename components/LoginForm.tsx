@@ -15,12 +15,14 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import axiosInstance from "../lib/axiosInstance";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 export const LoginForm = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -31,10 +33,41 @@ export const LoginForm = () => {
         username,
         password,
       });
-      console.log("Réponse du serveur:", response);
-      router.push("/dashboard");
-    } catch (error) {
+
+      if (response.status === 200) {
+        router.push("/dashboard");
+      } else {
+        toast({
+          title: "An error occurred",
+          description: "Please check your credentials and try again",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
       console.error(error);
+      // switch case for different error codes
+      switch (error.response.status) {
+        case 400:
+          toast({
+            title: "An error occurred",
+            description: "Missing fields.",
+            variant: "destructive",
+          });
+          break;
+        case 401:
+          toast({
+            title: "An error occurred",
+            description: "Please check your credentials and try again.",
+            variant: "destructive",
+          });
+          break;
+        default:
+          toast({
+            title: "An error occurred",
+            description: "Please try again later.",
+            variant: "destructive",
+          });
+      }
     } finally {
       setLoading(false);
     }
@@ -51,6 +84,7 @@ export const LoginForm = () => {
           <div className="gap-1">
             <Label htmlFor="username">Username</Label>
             <Input
+              required
               id="username"
               defaultValue=""
               placeholder="test"
@@ -61,6 +95,7 @@ export const LoginForm = () => {
           <div className="gap-1">
             <Label htmlFor="password">Password</Label>
             <Input
+              required
               id="password"
               type="password"
               defaultValue=""
