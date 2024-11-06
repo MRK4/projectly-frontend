@@ -3,11 +3,11 @@ import type { NextRequest } from "next/server";
 import { protectedRoutes } from "./routes";
 
 export function middleware(req: NextRequest) {
-  const cookie = req.cookies.get("sid"); // Vérifie la présence du cookie de session
-  const isAuthenticated = !!cookie; // Utilise le cookie comme indicateur d'authentification
+  const cookie = req.cookies.get("sid"); // Check for the session cookie
+  const isAuthenticated = !!cookie; // Use the cookie as an authentication indicator
   const requestedPath = req.nextUrl.pathname;
 
-  // Redirige si la route est protégée et l'utilisateur n'est pas authentifié
+  // Redirect if the route is protected and the user is not authenticated
   if (protectedRoutes.includes(requestedPath) && !isAuthenticated) {
     return NextResponse.redirect(new URL("/", req.url));
   }
