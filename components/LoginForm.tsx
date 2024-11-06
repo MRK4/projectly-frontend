@@ -15,12 +15,14 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import axiosInstance from "../lib/axiosInstance";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 export const LoginForm = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -31,10 +33,24 @@ export const LoginForm = () => {
         username,
         password,
       });
-      console.log("Réponse du serveur:", response);
-      router.push("/dashboard");
-    } catch (error) {
-      console.error(error);
+
+      if (response.status === 200) {
+        router.push("/dashboard");
+      } else {
+        toast({
+          title: "An error occurred",
+          description: "Please check your credentials and try again",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      // get the error message from the response
+      const message = error.response.data.message;
+      toast({
+        title: "An error occurred",
+        description: message,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
