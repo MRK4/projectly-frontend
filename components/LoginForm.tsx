@@ -16,6 +16,7 @@ import { useState } from "react";
 import axiosInstance from "../lib/axiosInstance";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
+import { useUser } from "@/context/UserContext";
 
 export const LoginForm = () => {
   const [username, setUsername] = useState("");
@@ -23,6 +24,7 @@ export const LoginForm = () => {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
+  const { setUser } = useUser();
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -34,9 +36,8 @@ export const LoginForm = () => {
         password,
       });
 
-      console.log(response);
-
       if (response.status === 200) {
+        setUser(response.data.data); // Set the user context
         router.push("/dashboard");
       } else {
         toast({
@@ -47,7 +48,6 @@ export const LoginForm = () => {
       }
     } catch (error: any) {
       console.error(error);
-      // switch case for different error codes
       switch (error.response.status) {
         case 400:
           toast({
