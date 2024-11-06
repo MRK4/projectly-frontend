@@ -15,17 +15,21 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import axiosInstance from "../lib/axiosInstance";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 export const RegisterForm = () => {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [isFormSent, setIsFormSent] = useState(false);
   const router = useRouter();
+  const { toast } = useToast();
 
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
+    setIsFormSent(true);
 
     try {
       const response = await axiosInstance.post("/users/signup", {
@@ -33,9 +37,29 @@ export const RegisterForm = () => {
         username,
         password,
       });
-      console.log("Réponse du serveur:", response);
-      router.push("/dashboard");
-    } catch (error) {
+      if (response.status === 201) {
+        toast({
+          title: "Account created ! ✨",
+          description: "You can now log in.",
+        });
+        // reset the form
+        setEmail("");
+        setUsername("");
+        setPassword("");
+      } else {
+        toast({
+          title: "An error occurred",
+          description: "Failed to send the form",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      setIsFormSent(true);
+      toast({
+        title: "An error occurred",
+        description: error.message,
+        variant: "destructive",
+      });
       console.error(error);
     } finally {
       setLoading(false);
